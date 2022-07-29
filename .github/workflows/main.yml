@@ -41,6 +41,11 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v24
+        with:
+          files: |
+            red_queen/games/applications/*.py
+          files_ignore: |
+            red_queen/__init__.py
 
       - name: List all changed files
         run: |
