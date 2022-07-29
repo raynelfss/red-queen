@@ -67,6 +67,6 @@ jobs:
       - name: Run every new benchmark
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
-            pytest ${file}
+            pytest $
           done
 
