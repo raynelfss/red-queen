@@ -50,6 +50,8 @@ jobs:
             red_queen/games/mapping/*.py
           files_ignore: |
             red_queen/__init__.py
+          path:
+            
       - name: Install Deps
         run: python -m pip install -U tox
       - name: Run every new benchmark
