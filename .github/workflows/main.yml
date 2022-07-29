@@ -52,6 +52,6 @@ jobs:
       - name: Run every new benchmark
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
-            tox -ebenchtest file
+            tox -ebenchtest ${file}
           done
 
