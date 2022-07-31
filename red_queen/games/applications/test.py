@@ -1,109 +1,76 @@
 # ------------------------------------------------------------------------------
-# Part of Red Queen Project.  This file is distributed under the Apache License.
+# Part of Red Queen Project.  This file is distributed under the MIT License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
 
-# This benchmark was implemented based on the folliwng paper:
-
-# title: "Application-Oriented Performance Benchmarks for Quantum Computing"
-# date-released: 2021-10-7
-# url: "https://arxiv.org/abs/2110.03137"
-# Content used: Circuits described in figures 25, 26 and 27.
-
-"""Benchmark for Quantum Fourier Transform"""
+"""Benchmark Bernstein Vazirani circuits."""
 
 import os
-import pytest
-from red_queen.games.applications import backends, run_qiskit_circuit
-import numpy as np
 
-# Importing standard Qiskit libraries
+import pytest
+
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
-
-DIRECTORY = "qasm"
-QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY)
-SECRET_STRING = "11111111"
+from red_queen.games.applications import backends, run_qiskit_circuit
 
 
-""" Generates Quantum Fourier Transform circuit using QFT and Inverse QFT"""
+QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
+SECRET_STRING = "110011"
 
 
-def generate_ft_circuit_1(binary):
-    qubits = QuantumRegister(len(binary))
-    bits = ClassicalRegister(len(binary))
-    qc = QuantumCircuit(qubits, bits, name="FT1")
-    for digit, number in enumerate(binary):
-        if number == "1":
-            qc.x((len(qubits) - 1) - digit)
-    qc.barrier()
-    # Let's try and recreate the quantum Fourier Transform SubCircuit
-    for qubit in range(len(qubits) - 1, -1, -1):
-        qc.h(qubit)
-        if not qubit == 0:
-            for subqubit in range(len(qubits) - 1, qubit - 1, -1):
-                qc.crz(np.pi / np.power(2, subqubit - (qubit - 1)), subqubit - 1, subqubit)
-    qc.barrier()
-    # We can continue implementing our gates:
-    for qubit in range(len(qubits)):
-        qc.rz(np.pi / np.power(2, qubit), qubit)
-    qc.barrier()
-    # Finally we the QFT circuit backwards by negating previous rotations.
-    for qubit in range(len(qubits)):
-        if not qubit == 0:
-            for subqubit in range(qubit, len(qubits)):
-                qc.crz((-1) * np.pi / np.power(2, subqubit - (qubit - 1)), subqubit - 1, subqubit)
-        qc.h(qubit)
-    qc.barrier()
-    # We can now measure and return the circuit
-    for qubit in range(len(qubits)):
-        qc.measure(qubit, qubit)
-    return qc
-
-
-def generate_ft_circuit_2(binary):
-    integer_value = int(binary, 2)
-    qubits = QuantumRegister(len(binary))
-    bits = ClassicalRegister(len(binary))
-    qc = QuantumCircuit(qubits, bits, name="FT2")
-    for qubit in range(len(qubits)):
-        qc.h(qubit)
-    qc.barrier()
-    for qubit in range(len(qubits)):
-        qc.rz(integer_value * np.pi / np.power(2, qubit), qubit)
-    qc.barrier()
-    for qubit in range(len(qubits)):
-        if not qubit == 0:
-            for subqubit in range(qubit, len(qubits)):
-                qc.crz((-1) * np.pi / np.power(2, subqubit - (qubit - 1)), subqubit - 1, subqubit)
-        qc.h(qubit)
-    qc.barrier()
-    for qubit in range(len(qubits)):
-        qc.measure(qubit, qubit)
+def build_bv_circuit(secret_string, mid_circuit_measure=False):
+    input_size = len(secret_string)
+    num_qubits = input_size + 1
+    if not mid_circuit_measure:
+        qr = QuantumRegister(num_qubits)
+        cr = ClassicalRegister(input_size)
+        qc = QuantumCircuit(qr, cr, name="main")
+        qc.x(qr[input_size])
+        qc.h(qr)
+        qc.barrier()
+        for i_qubit in range(input_size):
+            if secret_string[input_size - 1 - i_qubit] == "1":
+                qc.cx(qr[i_qubit], qr[input_size])
+        qc.barrier()
+        qc.h(qr)
+        qc.x(qr[input_size])
+        qc.barrier()
+        qc.measure(qr[:-1], cr)
+    else:
+        qr = QuantumRegister(2)
+        cr = ClassicalRegister(input_size)
+        qc = QuantumCircuit(qr, cr, name="main")
+        for i in range(input_size):
+            qc.x(qr[1])
+            qc.h(qr[1])
+            qc.barrier()
+            if secret_string[input_size - 1 - i] == "1":
+                qc.h(qr[0])
+                qc.cx(qr[0], qr[1])
+                qc.h(qr[0])
+            qc.measure(qr[0], cr[i])
+            qc.reset([0])
+            qc.reset([1])
     return qc
 
 
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
-@pytest.mark.parametrize("method", ["1", "2"])
-def bench_qiskit_ft(benchmark, optimization_level, backend, method):
+@pytest.mark.parametrize("method", ["normal", "mid-circuit measurement"])
+def bench_qiskit_bv(benchmark, optimization_level, backend, method):
     shots = 65536
-    integer_value = int(SECRET_STRING, 2)
-    binary_1 = format((integer_value + 1) % (2 ** (len(SECRET_STRING))), "b").zfill(
-        len(SECRET_STRING)
-    )
-    expected_counts = {binary_1: shots} if method == "1" else {SECRET_STRING: shots}
-    if method == "1":
-        benchmark.name = "Quantum Fourier Transform v1"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_1.qasm"))
+    expected_counts = {SECRET_STRING: shots}
+    if method == "normal":
+        benchmark.name = "Bernstein Vazirani"
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv1.qasm"))
     else:
-        benchmark.name = "Quantum Fourier Transform v2"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_2.qasm"))
+        benchmark.name = "Bernstein Vazirani (mid-circuit measurement)"
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv_mcm1.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
 
 if __name__ == "__main__":
-    generate_ft_circuit_1(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "ft_1.qasm"))
-    generate_ft_circuit_2(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "ft_2.qasm"))
+    build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
+    build_bv_circuit(SECRET_STRING, True).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
