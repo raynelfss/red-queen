@@ -31,7 +31,7 @@ jobs:
       - name: Run lint
         run: tox -elint
   build:
-    runs-on: ubuntu-latest  # windows-latest | macos-latest
+    runs-on: macos-latest  # windows-latest | ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.10"]
@@ -69,6 +69,6 @@ jobs:
       - name: Run every new benchmark
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
-            python3 -m pytest -s ${file}
+            python3 -m pytest -s ${file} -v
           done
 
