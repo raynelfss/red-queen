@@ -53,10 +53,10 @@ jobs:
       - name: Install Deps
         run: |
           python -m pip install --upgrade pip
-          pip install pytest-sugar
+          pip install pytest-sugar pytest-xdist[psutil]
           pip install .
       - name: Run every new benchmark
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
-            pytest ${file} -n2 --verbose
+            pytest ${file} --numprocesses auto --verbose
           done
