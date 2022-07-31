@@ -63,10 +63,10 @@ def bench_qiskit_bv(benchmark, optimization_level, backend, method):
     expected_counts = {SECRET_STRING: shots}
     if method == "normal":
         benchmark.name = "Bernstein Vazirani"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv1.qasm"))
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv.qasm"))
     else:
         benchmark.name = "Bernstein Vazirani (mid-circuit measurement)"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv_mcm1.qasm"))
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv_mcm.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
