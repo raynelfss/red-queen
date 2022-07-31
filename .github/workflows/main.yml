@@ -31,7 +31,7 @@ jobs:
       - name: Run lint
         run: tox -elint
   build:
-    runs-on: macos-12  # windows-latest | ubuntu-latest
+    runs-on: macos-latest  # windows-latest | ubuntu-latest
     name: Test changed-files
     steps:
       - uses: actions/checkout@v3
