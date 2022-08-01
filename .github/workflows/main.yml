@@ -46,7 +46,8 @@ jobs:
         uses: tj-actions/changed-files@v24
         with:
           files: |
-            red_queen/games/*.py
+            red_queen/games/applications/*.py
+            red_queen/games/mapping/*.py
           files_ignore: |
             red_queen/games/applications/__init__.py
             red_queen/games/mapping/__init__.py
