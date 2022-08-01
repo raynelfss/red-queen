@@ -58,7 +58,7 @@ jobs:
       - name: Run every new benchmark
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
-            pytest ${file} -n 3 --verbose --tb=no --store
+            pytest ${file} -n 4 --verbose --tb=no --store
             python -m report.console_tables --storage results/0001_bench.json
             rm results/0001_bench.json
           done
