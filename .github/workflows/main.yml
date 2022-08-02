@@ -56,6 +56,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
       - name: Run every new benchmark
-        run: |
-          pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
-          python -m report.console_tables --storage results/0001_bench.json
+        run: pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+      - name: Print the reports to console
+        run: python -m report.console_tables --storage results/0001_bench.json
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: results/0001_bench.json
