@@ -58,5 +58,5 @@ jobs:
           pip install .
       - name: Run every new benchmark
         run: |
-          pytest $(cat ${{steps.changed-files.outputs.all_changed_and_modified_files}}) -n 2 --verbose --store
+          pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
           python -m report.console_tables --storage results/0001_bench.json
