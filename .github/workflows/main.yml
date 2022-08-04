@@ -55,7 +55,7 @@ jobs:
         run: echo ${{steps.changes-applications.outputs.all_changed_and_modified_files}}
       - name: Test applications
         run: |
-          if [[ ${{steps.changes-applications.outputs.all_changed_and_modified_files}} == *"red_queen/games/applications/__init__.py"* ]]; then
+          if [[ "${{steps.changes-applications.outputs.all_changed_and_modified_files}}" == *"red_queen/games/applications/__init__.py"* ]]; then
               no_init="${{steps.changes-applications.outputs.all_changed_and_modified_files}}"//"red_queen/games/applications/__init__.py"/
               echo "$no_init"
               if [[ "$no_init" == "" ]]; then
