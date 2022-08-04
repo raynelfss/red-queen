@@ -47,7 +47,7 @@ jobs:
           pip install .
       - name: Get changes in applications
         id: changes-applications
-        uses: tj-action/changed-files@v24
+        uses: tj-action/changed-files@v24.1
         with:
           files: |
             red_queen/games/applications/*py
@@ -62,19 +62,9 @@ jobs:
               fi;
           else pytest ${{steps.changes-applications.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
           fi; 
-      # - name: Get changed benchmarks
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v24
-      #   with:
-      #     files: |
-      #       red_queen/games/applications/*.py
-      #       red_queen/games/mapping/*.py
-      #     files_ignore: |
-      #       red_queen/games/applications/__init__.py
-      #       red_queen/games/mapping/__init__.py
       - name: Get changes in mapping
         id: changes-mapping
-        uses: tj-action/changed-files@v24
+        uses: tj-action/changed-files@v24.1
         with:
           files: |
             red_queen/games/mapping/*py
