@@ -51,17 +51,17 @@ jobs:
         with:
           files: |
             red_queen/games/applications/*py
-     - name: Test applications
-        run: |
-          if [[ "$steps.changed-files.outputs.all_changed_and_modified_files" == *"red_queen/games/applications/__init__.py"* ]]; then
-              no_init=${steps.changed-files.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}
-              if [[ "$no_init" == "" ]]; then
-                  pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store;
-              else
-                  pytest "$no_init";
-              fi;
-          else pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
-          fi; 
+      - name: Test applications
+          run: |
+            if [[ "$steps.changed-files.outputs.all_changed_and_modified_files" == *"red_queen/games/applications/__init__.py"* ]]; then
+                no_init=${steps.changed-files.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}
+                if [[ "$no_init" == "" ]]; then
+                    pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store;
+                else
+                    pytest "$no_init";
+                fi;
+            else pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
+            fi; 
       # - name: Get changed benchmarks
       #   id: changed-files
       #   uses: tj-actions/changed-files@v24
