@@ -74,14 +74,16 @@ jobs:
             red_queen/games/mapping/*py
       - name: Test mapping
         run: |
-          if [[ "$steps.changes-mapping.outputs.all_changed_and_modified_files" == *"red_queen/games/mapping/__init__.py"* ]]; then
-              no_init=${steps.changes-mapping.outputs.all_changed_and_modified_files//"red_queen/games/mapping/__init__.py"/}
+          if [[ "${{steps.changes-mapping.outputs.all_changed_and_modified_files}}" == *"red_queen/games/mapping/__init__.py"* ]]; then
+              no_init=${${{steps.changes-mapping.outputs.all_changed_and_modified_files}}//"red_queen/games/mapping/__init__.py"/}
+              echo "$no_init"
               if [[ "$no_init" == "" ]]; then
                   pytest red_queen/games/mapping/map_misc.py -n 2 --verbose --store
               else
                   pytest "$no_init"
               fi
-          else pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+          else
+            pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
           fi 
       - name: Print results to log
         run: python -m report.console_tables --storage results/
