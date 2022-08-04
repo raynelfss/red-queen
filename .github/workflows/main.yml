@@ -69,6 +69,8 @@ jobs:
         with:
           files: |
             red_queen/games/mapping/*py
+      - name: Test step
+        run: echo "$steps.changes-mapping.outputs.all_changed_and_modified_files"
       - name: Test mapping
         run: |
           if [[ "$steps.changes-mapping.outputs.all_changed_and_modified_files" == *"red_queen/games/mapping/__init__.py"* ]]; then
