@@ -46,21 +46,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
       - name: Get changes in applications
-        id: changed-files
+        id: changes-applications
         uses: tj-action/changed-files@v24
         with:
           files: |
             red_queen/games/applications/*py
       - name: Test applications
         run: |
-          if [[ "$steps.changed-files.outputs.all_changed_and_modified_files" == *"red_queen/games/applications/__init__.py"* ]]; then
-              no_init=${steps.changed-files.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}
+          if [[ "$steps.changes-applications.outputs.all_changed_and_modified_files" == *"red_queen/games/applications/__init__.py"* ]]; then
+              no_init=${steps.changes-applications.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}
               if [[ "$no_init" == "" ]]; then
                   pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store;
               else
                   pytest "$no_init";
               fi;
-          else pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
+          else pytest ${{steps.changes-applications.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
           fi; 
       # - name: Get changed benchmarks
       #   id: changed-files
@@ -73,24 +73,22 @@ jobs:
       #       red_queen/games/applications/__init__.py
       #       red_queen/games/mapping/__init__.py
       - name: Get changes in mapping
-        id: changed-files
+        id: changes-mapping
         uses: tj-action/changed-files@v24
         with:
           files: |
             red_queen/games/mapping/*py
       - name: Test mapping
         run: |
-          if [[ "$steps.changed-files.outputs.all_changed_and_modified_files" == *"red_queen/games/mapping/__init__.py"* ]]; then
-              no_init=${steps.changed-files.outputs.all_changed_and_modified_files//"red_queen/games/mapping/__init__.py"/}
+          if [[ "$steps.changes-mapping.outputs.all_changed_and_modified_files" == *"red_queen/games/mapping/__init__.py"* ]]; then
+              no_init=${steps.changes-mapping.outputs.all_changed_and_modified_files//"red_queen/games/mapping/__init__.py"/}
               if [[ "$no_init" == "" ]]; then
                   pytest red_queen/games/mapping/map_misc.py -n 2 --verbose --store;
               else
                   pytest "$no_init";
               fi;
-          else pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
+          else pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
           fi; 
-      - name: Run every new benchmark
-        run: pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
       - name: Print results to log
         run: python -m report.console_tables --storage results/
       - name: Upload original result file
