@@ -51,8 +51,6 @@ jobs:
         with:
           files: |
             red_queen/games/applications/*py
-      - name: Test step
-        run: echo ${{steps.changes-applications.outputs.all_changed_and_modified_files}}
       - name: Test applications
         run: |
           if [[ "${{steps.changes-applications.outputs.all_changed_and_modified_files}}" != "" ]]; then

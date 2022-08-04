@@ -51,5 +51,3 @@ def run_qiskit_circuit(benchmark, circuit, backend, optimization_level, shots, e
     info.quality_stats["xi"] = num_2q / (num_1q + num_2q)
     counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
     info.quality_stats["fidelity"] = hellinger_fidelity(counts, expected_counts)
-
-print("I am not here!")
