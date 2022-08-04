@@ -41,24 +41,58 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-      - name: Get changed benchmarks
-        id: changed-files
-        uses: tj-actions/changed-files@v24
-        with:
-          files: |
-            red_queen/games/applications/*.py
-            red_queen/games/mapping/*.py
-          files_ignore: |
-            red_queen/games/applications/__init__.py
-            red_queen/games/mapping/__init__.py
       - name: Install Deps
         run: |
           python -m pip install --upgrade pip
           pip install .
+      - name: Get changes in applications
+        id: changed-files
+        uses: tj-action/changed-files@v24
+        with:
+          files: |
+            red_queen/games/applications/*py
+     - name: Test applications
+        run: |
+          if [[ "$steps.changed-files.outputs.all_changed_and_modified_files" == *"red_queen/games/applications/__init__.py"* ]]; then
+              no_init=${steps.changed-files.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}
+              if [[ "$no_init" == "" ]]; then
+                  pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store;
+              else
+                  pytest "$no_init";
+              fi;
+          else pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
+          fi; 
+      # - name: Get changed benchmarks
+      #   id: changed-files
+      #   uses: tj-actions/changed-files@v24
+      #   with:
+      #     files: |
+      #       red_queen/games/applications/*.py
+      #       red_queen/games/mapping/*.py
+      #     files_ignore: |
+      #       red_queen/games/applications/__init__.py
+      #       red_queen/games/mapping/__init__.py
+      - name: Get changes in mapping
+        id: changed-files
+        uses: tj-action/changed-files@v24
+        with:
+          files: |
+            red_queen/games/mapping/*py
+      - name: Test mapping
+        run: |
+          if [[ "$steps.changed-files.outputs.all_changed_and_modified_files" == *"red_queen/games/mapping/__init__.py"* ]]; then
+              no_init=${steps.changed-files.outputs.all_changed_and_modified_files//"red_queen/games/mapping/__init__.py"/}
+              if [[ "$no_init" == "" ]]; then
+                  pytest red_queen/games/mapping/map_misc.py -n 2 --verbose --store;
+              else
+                  pytest "$no_init";
+              fi;
+          else pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store;
+          fi; 
       - name: Run every new benchmark
         run: pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
       - name: Print results to log
-        run: python -m report.console_tables --storage results/0001_bench.json
+        run: python -m report.console_tables --storage results/
       - name: Upload original result file
         uses: actions/upload-artifact@v3
         with:
