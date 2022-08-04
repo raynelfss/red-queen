@@ -52,11 +52,11 @@ jobs:
           files: |
             red_queen/games/applications/*py
       - name: Test step
-        run: echo ${steps.changes-applications.outputs.all_changed_and_modified_files}
+        run: echo ${{steps.changes-applications.outputs.all_changed_and_modified_files}}
       - name: Test applications
         run: |
-          if [[ "$steps.changes-applications.outputs.all_changed_and_modified_files" == *"red_queen/games/applications/__init__.py"* ]]; then
-              no_init=${steps.changes-applications.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}
+          if [[ ${{steps.changes-applications.outputs.all_changed_and_modified_files}} == *"red_queen/games/applications/__init__.py"* ]]; then
+              no_init=${{steps.changes-applications.outputs.all_changed_and_modified_files//"red_queen/games/applications/__init__.py"/}}
               echo "$no_init"
               if [[ "$no_init" == "" ]]; then
                   pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store
