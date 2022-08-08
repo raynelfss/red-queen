@@ -94,4 +94,3 @@ jobs:
         with:
           name: results
           path: results/
-          if-no-files-found: error
