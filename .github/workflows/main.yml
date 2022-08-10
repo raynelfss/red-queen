@@ -55,27 +55,6 @@ jobs:
         with:
             path: red_queen/games/mapping
             default_bench:  red_queen/games/mapping/map_misc.py
-      # - name: Get changes in mapping
-      #   id: changes-mapping
-      #   uses: tj-actions/changed-files@v24.1
-      #   with:
-      #     files: |
-      #       red_queen/games/mapping/*py
-      # - name: Test mapping
-      #   run: |
-      #     if [[ "${{steps.changes-mapping.outputs.all_changed_and_modified_files}}" != "" ]]; then
-      #       if [[ "${{steps.changes-mapping.outputs.all_changed_and_modified_files}}" == *"red_queen/games/mapping/__init__.py"* ]]; then
-      #           no_init=${${{steps.changes-mapping.outputs.all_changed_and_modified_files}}//"red_queen/games/mapping/__init__.py"/}
-      #           echo "$no_init"
-      #           if [[ "$no_init" == "" ]]; then
-      #               pytest red_queen/games/mapping/map_misc.py -n 2 --verbose --store
-      #           else
-      #               pytest "$no_init" -n 2 --verbose --store
-      #           fi
-      #       else
-      #         pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
-      #       fi
-      #     fi 
       - name: Print results to log
         run: python -m report.console_tables --storage results/
       - name: Upload original result file
@@ -83,4 +62,3 @@ jobs:
         with:
           name: results
           path: results/
-          if-no-files-found: error
