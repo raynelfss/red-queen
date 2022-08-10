@@ -1,0 +1,34 @@
+name: 'Run Changed Benchmarks'
+description: 'Run Change Benchmarks'
+inputs:
+  path:
+    description: 'Benchmark paths'
+    required: true
+  default-bench:
+    description: 'Default benchmark'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Get changes in applications
+      id: changed-benchmarks
+      uses: tj-actions/changed-files@v24.1
+      with:
+        files: |
+          ${{ inputs.path }}
+    - name: Test applications
+      run: |
+        if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" != "" ]]; then
+          if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" == *"red_queen/games/applications/__init__.py"* ]]; then
+              no_init=${${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}//"red_queen/games/applications/__init__.py"/}
+              echo "$no_init"
+              if [[ "$no_init" == "" ]]; then
+                  pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store
+              else
+                  pytest "$no_init" -n 2 --verbose --store
+              fi
+          else
+            pytest ${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+          fi
+        fi
+      shell: bash
