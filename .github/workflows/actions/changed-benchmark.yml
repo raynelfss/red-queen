@@ -19,11 +19,11 @@ runs:
     - name: Test applications
       run: |
         if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" != "" ]]; then
-          if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" == *"red_queen/games/applications/__init__.py"* ]]; then
-              no_init=${${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}//"red_queen/games/applications/__init__.py"/}
+          if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" == *"${{ inputs.path }/__init__.py"* ]]; then
+              no_init=${${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}//"${{ inputs.path }}/__init__.py"/}
               echo "$no_init"
               if [[ "$no_init" == "" ]]; then
-                  pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store
+                  pytest ${{ inputs.default-bench }} -n 2 --verbose --store
               else
                   pytest "$no_init" -n 2 --verbose --store
               fi
