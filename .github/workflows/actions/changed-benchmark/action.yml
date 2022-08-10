@@ -1,5 +1,5 @@
 name: 'Run Changed Benchmarks'
-description: 'Run Change Benchmarks'
+description: 'Run Changed Benchmarks'
 inputs:
   path:
     description: 'Benchmark paths'

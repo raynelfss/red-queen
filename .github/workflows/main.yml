@@ -52,6 +52,7 @@ jobs:
             default_bench: red_queen/games/applications/run_bv.py
       - name: Run changed mapping benchmarks
         uses: ./.github/actions/changed-benchmark
+        with:
             path: red_queen/games/mapping
             default_bench:  red_queen/games/mapping/map_misc.py
       # - name: Get changes in mapping
