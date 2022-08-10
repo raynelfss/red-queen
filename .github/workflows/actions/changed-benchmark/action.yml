@@ -4,7 +4,7 @@ inputs:
   path:
     description: 'Benchmark paths'
     required: true
-  default-bench:
+  default_bench:
     description: 'Default benchmark'
     required: true
 runs:
