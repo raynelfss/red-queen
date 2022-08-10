@@ -46,13 +46,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
       - name: Run changed application benchmarks
-        uses: changed-benchmark
+        uses: ./.github/actions/changed-benchmark
         with:
             path: red_queen/games/applications
             default_bench: red_queen/games/applications/run_bv.py
       - name: Run changed mapping benchmarks
-        uses: run-changed-benchmarks
-        with:
+        uses: ./.github/actions/changed-benchmark
             path: red_queen/games/mapping
             default_bench:  red_queen/games/mapping/map_misc.py
       # - name: Get changes in mapping
